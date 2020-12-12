@@ -1,33 +1,33 @@
 import PropTypes from 'prop-types';
-import React, {PureComponent} from 'react';
+import React, { PureComponent } from 'react';
 import {
-    Animated,
-    Dimensions,
-    FlatList,
-    I18nManager,
-    Modal,
-    Platform,
     Text,
-    TouchableWithoutFeedback,
     View,
+    FlatList,
+    Animated,
+    Modal,
+    TouchableWithoutFeedback,
+    Dimensions,
+    Platform,
     ViewPropTypes,
+    I18nManager,
 } from 'react-native';
 import Ripple from 'react-native-material-ripple';
-import {TextField} from 'react-native-material-textfield';
+import { TextInput } from 'react-native-paper';
 
 import DropdownItem from '../item';
 import styles from './styles';
 
 export default class Dropdown extends PureComponent {
     static defaultProps = {
-        hitSlop: {top: 6, right: 4, bottom: 6, left: 4},
+        hitSlop: { top: 6, right: 4, bottom: 6, left: 4 },
 
         disabled: false,
 
         data: [],
 
-        valueExtractor: ({value} = {}, index) => value,
-        labelExtractor: ({label} = {}, index) => label,
+        valueExtractor: ({ value } = {}, index) => value,
+        labelExtractor: ({ label } = {}, index) => label,
         propsExtractor: () => null,
 
         absoluteRTLLayout: false,
@@ -145,7 +145,9 @@ export default class Dropdown extends PureComponent {
 
         renderBase: PropTypes.func,
         renderAccessory: PropTypes.func,
+        renderPickerItem: PropTypes.func,
 
+        labelContainerStyle: (ViewPropTypes || View.propTypes).style,
         containerStyle: (ViewPropTypes || View.propTypes).style,
         overlayStyle: (ViewPropTypes || View.propTypes).style,
         pickerStyle: (ViewPropTypes || View.propTypes).style,
@@ -172,10 +174,12 @@ export default class Dropdown extends PureComponent {
 
         this.keyExtractor = this.keyExtractor.bind(this);
 
+
+
         this.blur = () => this.onClose();
         this.focus = this.onPress;
 
-        let {value} = this.props;
+        let { value } = this.props;
 
         this.mounted = false;
         this.focused = false;
@@ -188,10 +192,11 @@ export default class Dropdown extends PureComponent {
         };
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        if (prevProps.value !== this.props.value) {
-            this.setState({value: this.props.value});
+    static getDerivedStateFromProps(props, state) {
+        if(props.value !== state.value) {
+            return {value: props.value};
         }
+        else return null;
     }
 
     componentDidMount() {
@@ -210,7 +215,7 @@ export default class Dropdown extends PureComponent {
             itemPadding,
             rippleDuration,
             dropdownOffset,
-            dropdownMargins: {min: minMargin, max: maxMargin},
+            dropdownMargins: { min: minMargin, max: maxMargin },
             animationDuration,
             absoluteRTLLayout,
             useNativeDriver,
@@ -245,7 +250,7 @@ export default class Dropdown extends PureComponent {
         let dimensions = Dimensions.get('window');
 
         this.container.measureInWindow((x, y, containerWidth, containerHeight) => {
-            let {opacity} = this.state;
+            let { opacity } = this.state;
 
             /* Adjust coordinates for relative layout in RTL locale */
             if (I18nManager.isRTL && !absoluteRTLLayout) {
@@ -303,7 +308,7 @@ export default class Dropdown extends PureComponent {
                         })
                         .start(() => {
                             if (this.mounted && 'ios' === Platform.OS) {
-                                let {flashScrollIndicators} = this.scroll || {};
+                                let { flashScrollIndicators } = this.scroll || {};
 
                                 if ('function' === typeof flashScrollIndicators) {
                                     flashScrollIndicators.call(this.scroll);
@@ -316,8 +321,8 @@ export default class Dropdown extends PureComponent {
     }
 
     onClose(value = this.state.value) {
-        let {onBlur, animationDuration, useNativeDriver} = this.props;
-        let {opacity} = this.state;
+        let { onBlur, animationDuration, useNativeDriver } = this.props;
+        let { opacity } = this.state;
 
         Animated
             .timing(opacity, {
@@ -333,7 +338,7 @@ export default class Dropdown extends PureComponent {
                 }
 
                 if (this.mounted) {
-                    this.setState({value, modal: false});
+                    this.setState({ value, modal: false });
                 }
             });
     }
@@ -358,7 +363,7 @@ export default class Dropdown extends PureComponent {
     }
 
     onLayout(event) {
-        let {onLayout} = this.props;
+        let { onLayout } = this.props;
 
         if ('function' === typeof onLayout) {
             onLayout(event);
@@ -366,21 +371,21 @@ export default class Dropdown extends PureComponent {
     }
 
     value() {
-        let {value} = this.state;
+        let { value } = this.state;
 
         return value;
     }
 
     selectedIndex() {
-        let {value} = this.state;
-        let {data, valueExtractor} = this.props;
+        let { value } = this.state;
+        let { data, valueExtractor } = this.props;
 
         return data
             .findIndex((item, index) => null != item && value === valueExtractor(item, index));
     }
 
     selectedItem() {
-        let {data} = this.props;
+        let { data } = this.props;
 
         return data[this.selectedIndex()];
     }
@@ -390,13 +395,13 @@ export default class Dropdown extends PureComponent {
     }
 
     itemSize() {
-        let {fontSize, itemPadding} = this.props;
+        let { fontSize, itemPadding } = this.props;
 
         return Math.ceil(fontSize * 1.5 + itemPadding * 2);
     }
 
     visibleItemCount() {
-        let {data, itemCount} = this.props;
+        let { data, itemCount } = this.props;
 
         return Math.min(data.length, itemCount);
     }
@@ -413,12 +418,12 @@ export default class Dropdown extends PureComponent {
             left = 0,
         } = this.props.rippleInsets || {};
 
-        return {top, right, bottom, left};
+        return { top, right, bottom, left };
     }
 
     resetScrollOffset() {
-        let {selected} = this.state;
-        let {data, dropdownPosition} = this.props;
+        let { selected } = this.state;
+        let { data, dropdownPosition } = this.props;
 
         let offset = 0;
         let itemCount = data.length;
@@ -460,7 +465,7 @@ export default class Dropdown extends PureComponent {
         }
 
         if (this.scroll) {
-            this.scroll.scrollToOffset({offset, animated: false});
+            this.scroll.scrollToOffset({ offset, animated: false });
         }
     }
 
@@ -469,13 +474,13 @@ export default class Dropdown extends PureComponent {
     }
 
     keyExtractor(item, index) {
-        let {valueExtractor} = this.props;
+        let { valueExtractor } = this.props;
 
         return `${index}-${valueExtractor(item, index)}`;
     }
 
-    renderBase(props) {
-        let {value} = this.state;
+    renderizeBase(props) {
+        let { value } = this.state;
         let {
             data,
             renderBase,
@@ -496,7 +501,7 @@ export default class Dropdown extends PureComponent {
         }
 
         if ('function' === typeof renderBase) {
-            return renderBase({...props, title, value, renderAccessory});
+            return renderBase({ ...props, title, value });
         }
 
         title = null == title || 'string' === typeof title ?
@@ -504,16 +509,13 @@ export default class Dropdown extends PureComponent {
             String(title);
 
         return (
-            <TextField
+            <TextInput
+                style={{backgroundColor: "transparent", marginBottom: 16}}
                 label=''
-                labelHeight={dropdownOffset.top - Platform.select({ios: 1, android: 2})}
-
                 {...props}
-
                 value={title}
                 editable={false}
                 onChangeText={undefined}
-                renderAccessory={renderAccessory}
             />
         );
     }
@@ -528,7 +530,7 @@ export default class Dropdown extends PureComponent {
             rippleSequential,
         } = this.props;
 
-        let {bottom, ...insets} = this.rippleInsets();
+        let { bottom, ...insets } = this.rippleInsets();
         let style = {
             ...insets,
 
@@ -550,24 +552,24 @@ export default class Dropdown extends PureComponent {
     }
 
     renderAccessory() {
-        let {baseColor: backgroundColor} = this.props;
-        let triangleStyle = {backgroundColor};
+        let { baseColor: backgroundColor } = this.props;
+        let triangleStyle = { backgroundColor };
 
         return (
             <View style={styles.accessory}>
                 <View style={styles.triangleContainer}>
-                    <View style={[styles.triangle, triangleStyle]}/>
+                    <View style={[styles.triangle, triangleStyle]} />
                 </View>
             </View>
         );
     }
 
-    renderItem({item, index}) {
+    renderItem({ item, index }) {
         if (null == item) {
             return null;
         }
 
-        let {selected, leftInset, rightInset} = this.state;
+        let { selected, leftInset, rightInset } = this.state;
 
         let {
             valueExtractor,
@@ -583,11 +585,11 @@ export default class Dropdown extends PureComponent {
             rippleOpacity,
             rippleDuration,
             shadeOpacity,
+            renderPickerItem,
         } = this.props;
-
         let props = propsExtractor(item, index);
 
-        let {style, disabled}
+        let { style, disabled }
             = props
             = {
             rippleDuration,
@@ -617,7 +619,7 @@ export default class Dropdown extends PureComponent {
                     itemColor :
                 selectedItemColor;
 
-        let textStyle = {color, fontSize};
+        let textStyle = { color, fontSize };
 
         props.style = [
             style,
@@ -630,9 +632,13 @@ export default class Dropdown extends PureComponent {
 
         return (
             <DropdownItem index={index} {...props}>
-                <Text style={[styles.item, itemTextStyle, textStyle]} numberOfLines={1}>
-                    {title}
-                </Text>
+                {!renderPickerItem ?
+                    <Text style={[styles.item, itemTextStyle, textStyle]} numberOfLines={1}>
+                        {title}
+                    </Text>
+                    :
+                    renderPickerItem(item)
+                }
             </DropdownItem>
         );
     }
@@ -642,6 +648,7 @@ export default class Dropdown extends PureComponent {
             renderBase,
             renderAccessory,
             containerStyle,
+            labelContainerStyle,
             overlayStyle: overlayStyleOverrides,
             pickerStyle: pickerStyleOverrides,
 
@@ -669,7 +676,7 @@ export default class Dropdown extends PureComponent {
             dropdownPosition,
         } = props;
 
-        let {left, top, width, opacity, selected, modal} = this.state;
+        let { left, top, width, opacity, selected, modal } = this.state;
 
         let itemCount = data.length;
         let visibleItemCount = this.visibleItemCount();
@@ -703,14 +710,14 @@ export default class Dropdown extends PureComponent {
             }
         }
 
-        let overlayStyle = {opacity};
+        let overlayStyle = { opacity };
 
         let pickerStyle = {
             width,
             height,
             top,
             left,
-            transform: [{translateY}],
+            transform: [{ translateY }],
         };
 
         let touchableProps = {
@@ -728,7 +735,17 @@ export default class Dropdown extends PureComponent {
             <View onLayout={this.onLayout} ref={this.updateContainerRef} style={containerStyle}>
                 <TouchableWithoutFeedback {...touchableProps}>
                     <View pointerEvents='box-only'>
-                        {this.renderBase(props)}
+                        <View style={{
+                            flexDirection: 'row',
+                            flex: 1,
+                            alignItems: "flex-end",
+                            justifyContent: "space-between",
+                        }}>
+                            <View style={{flex: 1,}}>
+                                {this.renderizeBase(props)}
+                            </View>
+                            {this.renderAccessory(props)}
+                        </View>
                         {this.renderRipple()}
                     </View>
                 </TouchableWithoutFeedback>
